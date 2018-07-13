@@ -77,6 +77,7 @@ class MainGUI:
         self.filenameBuffer = None
         self.objectLabelList = []
         self.EDIT = False
+        self.autoSuggest = StringVar()
 
         # initialize mouse state
         self.STATE = {'x': 0, 'y': 0}
@@ -94,29 +95,37 @@ class MainGUI:
         self.ctrlPanel = Frame(self.frame)
         self.ctrlPanel.grid(row=0, column=0, sticky=W + N)
         self.openBtn = Button(self.ctrlPanel, text='Open', command=self.open_image)
-        self.openBtn.pack(fill=X, side=TOP)
+        self.openBtn.grid(columnspan=2, sticky=W + E)
         self.openDirBtn = Button(self.ctrlPanel, text='Open Dir', command=self.open_image_dir)
-        self.openDirBtn.pack(fill=X, side=TOP)
+        self.openDirBtn.grid(columnspan=2, sticky=W + E)
+        self.openVidBtn = Button(self.ctrlPanel, text='Open Video', command=self.open_video_file)
+        self.openVidBtn.grid(columnspan=2, sticky=W + E)
         self.nextBtn = Button(self.ctrlPanel, text='Next -->', command=self.open_next)
-        self.nextBtn.pack(fill=X, side=TOP)
+        self.nextBtn.grid(columnspan=2, sticky=W + E)
         self.previousBtn = Button(self.ctrlPanel, text='<-- Previous', command=self.open_previous)
-        self.previousBtn.pack(fill=X, side=TOP)
+        self.previousBtn.grid(columnspan=2, sticky=W + E)
         self.saveBtn = Button(self.ctrlPanel, text='Save', command=self.save)
-        self.saveBtn.pack(fill=X, side=TOP)
+        self.saveBtn.grid(columnspan=2, sticky=W + E)
+        self.autoManualLabel = Label(self.ctrlPanel, text="Suggestion Mode")
+        self.autoManualLabel.grid(columnspan=2, sticky=W + E)
+        self.radioBtnAuto = Radiobutton(self.ctrlPanel, text="Auto", variable=self.autoSuggest, value=1)
+        self.radioBtnAuto.grid(row=7, column=0, sticky=W + E)
+        self.radioBtnManual = Radiobutton(self.ctrlPanel, text="Manual", variable=self.autoSuggest, value=2)
+        self.radioBtnManual.grid(row=7, column=1, sticky=W + E)
         self.semiAutoBtn = Button(self.ctrlPanel, text="Show Suggestions", command=self.automate)
-        self.semiAutoBtn.pack(fill=X, side=TOP)
+        self.semiAutoBtn.grid(columnspan=2, sticky=W + E)
         self.disp = Label(self.ctrlPanel, text='Coordinates:')
-        self.disp.pack(fill=X, side=TOP)
+        self.disp.grid(columnspan=2, sticky=W + E)
         self.mb = Menubutton(self.ctrlPanel, text="COCO Classes for Suggestions", relief=RAISED)
-        self.mb.pack(fill=X, side=TOP)
+        self.mb.grid(columnspan=2, sticky=W + E)
         self.mb.menu = Menu(self.mb, tearoff=0)
         self.mb["menu"] = self.mb.menu
         self.addCocoBtn = Button(self.ctrlPanel, text="+", command=self.add_labels_coco)
-        self.addCocoBtn.pack(fill=X, side=TOP)
+        self.addCocoBtn.grid(columnspan=2, sticky=W + E)
         self.zoomPanelLabel = Label(self.ctrlPanel, text="Precision View Panel")
-        self.zoomPanelLabel.pack(fill=X, side=TOP)
+        self.zoomPanelLabel.grid(columnspan=2, sticky=W + E)
         self.zoomcanvas = Canvas(self.ctrlPanel, width=150, height=150)
-        self.zoomcanvas.pack(fill=X, side=TOP, anchor='center')
+        self.zoomcanvas.grid(columnspan=2, sticky=W + E)
 
         # Image Editing Region
         self.canvas = Canvas(self.frame, width=500, height=500)
@@ -184,6 +193,9 @@ class MainGUI:
         self.imageDirPathBuffer = self.imageDir
         self.load_image(self.imageDirPathBuffer + '/' + self.imageList[self.cur])
 
+    def open_video_file(self):
+        pass
+
     def load_image(self, file):
         self.img = Image.open(file)
         self.imageCur = self.cur + 1
@@ -212,6 +224,8 @@ class MainGUI:
             self.load_image(self.imageDirPathBuffer + '/' + self.imageList[self.cur])
         self.processingLabel.config(text="                      ")
         self.processingLabel.update_idletasks()
+        if self.autoSuggest.get() == str(1):
+            self.automate()
 
     def open_previous(self, event=None):
         self.save()
@@ -220,6 +234,8 @@ class MainGUI:
             self.load_image(self.imageDirPathBuffer + '/' + self.imageList[self.cur])
         self.processingLabel.config(text="                      ")
         self.processingLabel.update_idletasks()
+        if self.autoSuggest.get() == str(1):
+            self.automate()
 
     def save(self):
         if self.filenameBuffer is None:
