@@ -23,6 +23,7 @@ import numpy as np
 import tensorflow as tf
 import config
 import math
+from pascal_voc_writer import Writer
 
 
 def get_session():
@@ -78,6 +79,7 @@ class MainGUI:
         self.objectLabelList = []
         self.EDIT = False
         self.autoSuggest = StringVar()
+        self.writer = None
 
         # initialize mouse state
         self.STATE = {'x': 0, 'y': 0}
@@ -239,18 +241,32 @@ class MainGUI:
 
     def save(self):
         if self.filenameBuffer is None:
+            w, h = self.img.size
+            self.writer = Writer(self.imageDirPathBuffer + '/' + self.imageList[self.cur], w, h)
             self.annotation_file = open('annotations/' + self.anno_filename, 'a')
             for idx, item in enumerate(self.bboxList):
+                x1, y1, x2, y2 = self.bboxList[idx]
+                self.writer.addObject(str(self.objectLabelList[idx]), x1, y1, x2, y2)
                 self.annotation_file.write(self.imageDirPathBuffer + '/' + self.imageList[self.cur] + ',' +
                                            ','.join(map(str, self.bboxList[idx])) + ',' + str(self.objectLabelList[idx])
                                            + '\n')
             self.annotation_file.close()
+            baseName = os.path.splitext(self.imageList[self.cur])[0]
+            self.writer.save('annotations/annotations_voc/' + baseName + '.xml')
+            self.writer = None
         else:
+            w, h = self.img.size
+            self.writer = Writer(self.filenameBuffer, w, h)
             self.annotation_file = open('annotations/' + self.anno_filename, 'a')
             for idx, item in enumerate(self.bboxList):
+                x1, y1, x2, y2 = self.bboxList[idx]
+                self.writer.addObject(str(self.objectLabelList[idx]), x1, y1, x2, y2)
                 self.annotation_file.write(self.filenameBuffer + ',' + ','.join(map(str, self.bboxList[idx])) + ','
                                            + str(self.objectLabelList[idx]) + '\n')
             self.annotation_file.close()
+            baseName = os.path.splitext(self.imageList[self.cur])[0]
+            self.writer.save('annotations/annotations_voc/' + baseName + '.xml')
+            self.writer = None
 
     def mouse_click(self, event):
         # Check if Updating BBox
