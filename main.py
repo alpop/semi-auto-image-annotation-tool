@@ -26,14 +26,12 @@ import math
 
 
 def get_session():
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto() 
     config.gpu_options.allow_growth = True
-    return tf.Session(config=config)
+    return tf.compat.v1.Session(config=config)
 
 
-keras.backend.tensorflow_backend.set_session(get_session())
-
-model_path = os.path.join('.', 'snapshots', 'resnet50_coco_best_v2.1.0.h5')
+model_path = os.path.join('..', 'snapshots', 'resnet50_coco_best_v2.1.0.h5')
 
 model = models.load_model(model_path, backbone_name='resnet50')
 
