@@ -31,7 +31,7 @@ def get_session():
     return tf.compat.v1.Session(config=config)
 
 
-model_path = os.path.join('..', 'snapshots', 'resnet50_coco_best_v2.1.0.h5')
+model_path = os.path.join('.', 'snapshots', 'resnet50_coco_best_v2.1.0.h5')
 
 model = models.load_model(model_path, backbone_name='resnet50')
 
